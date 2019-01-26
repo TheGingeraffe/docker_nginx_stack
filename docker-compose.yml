@@ -1,20 +1,27 @@
 version: '3'
 services:
   nginx:
-    image: nginx:1.15-alpine
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
     ports:
       - "8808:80"
       - "443:443"
+    networks:
+      - frontend
     volumes:
       - /home/baal/nginx/conf.d:/etc/nginx/conf.d
-      - /home/baal/certbot/conf:/etc/letsencrypt
-      - /home/baal/certbot/www:/var/www/certbot
+      - /home/baal/nginx/ssl:/etc/letsencrypt
+      - /home/baal/nginx/www:/var/www/certbot
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
   certbot:
     image: certbot/certbot
+    container_name: certbot
+    networks:
+      - frontend
     volumes:
-      - /home/baal/certbot/conf:/etc/letsencrypt
-      - /home/baal/certbot/www:/var/www/certbot
+      - /home/baal/nginx/ssl:/etc/letsencrypt
+      - /home/baal/nginx/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
   plex:
     image: linuxserver/plex
@@ -31,6 +38,8 @@ services:
       - "32413:32413"
       - "32414:32414"
       - "32469:32469"
+    networks:
+      - frontend
     env_file:
       - /home/baal/config/docker.env
     volumes:
@@ -39,3 +48,5 @@ services:
       - /home/baal/plex/movies:/data/movies
       - /home/baal/plex/music:/data/music
       - /home/baal/plex/transcode:/data/transcode
+networks:
+  frontend:
