@@ -1,0 +1,41 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:1.15-alpine
+    ports:
+      - "8808:80"
+      - "443:443"
+    volumes:
+      - /home/baal/nginx/conf.d:/etc/nginx/conf.d
+      - /home/baal/certbot/conf:/etc/letsencrypt
+      - /home/baal/certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - /home/baal/certbot/conf:/etc/letsencrypt
+      - /home/baal/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  plex:
+    image: linuxserver/plex
+    container_name: plex
+    restart: always
+    ports:
+      - "32400:32400"
+      - "1900:1900"
+      - "3005:3005"
+      - "5353:5353"
+      - "8324:8324"
+      - "32410:32410"
+      - "32412:32412"
+      - "32413:32413"
+      - "32414:32414"
+      - "32469:32469"
+    env_file:
+      - /home/baal/config/docker.env
+    volumes:
+      - /home/baal/plex/config:/config
+      - /home/baal/plex/tv:/data/tvshows
+      - /home/baal/plex/movies:/data/movies
+      - /home/baal/plex/music:/data/music
+      - /home/baal/plex/transcode:/data/transcode
