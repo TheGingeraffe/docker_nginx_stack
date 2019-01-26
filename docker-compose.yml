@@ -1,7 +1,7 @@
 version: '3'
 services:
   nginx:
-    image: nginx:alpine
+    image: nginx:stable
     container_name: nginx
     restart: unless-stopped
     ports:
@@ -40,8 +40,6 @@ services:
       - "32469:32469"
     networks:
       - frontend
-    env_file:
-      - /home/baal/config/docker.env
     volumes:
       - /home/baal/plex/config:/config
       - /home/baal/plex/tv:/data/tvshows
