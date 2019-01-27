@@ -77,5 +77,34 @@ services:
       - /home/baal/jackett/downloads:/data
     ports:
       - "9117:9117"
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    restart: always
+    ports:
+      - "7878:7878"
+    networks:
+      - frontend
+    env_file:
+      - /home/baal/config/docker.env
+    volumes:
+      - /home/baal/radarr/config:/config
+      - /home/baal/transmission/downloads:/data
+      - /home/baal/plex/movies:/movies
+      - /home/baal/transmission/downloads/trash:/data/trash
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    restart: always
+    ports:
+      - "8989:8989"
+    networks:
+      - frontend
+    env_file:
+      - /home/baal/config/docker.env
+    volumes:
+      - /home/baal/sonarr/config:/config
+      - /home/baal/plex/tv:/tv
+      - /home/baal/transmission/downloads:/data
 networks:
   frontend:
