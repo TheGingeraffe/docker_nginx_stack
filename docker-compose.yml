@@ -64,5 +64,18 @@ services:
       - /home/baal/transmission/downloads:/data
       - /etc/localtime:/etc/localtime:ro
       - /home/baal/transmission/openvpn/AirVPN_All-servers_UDP-443.ovpn:/etc/openvpn/custom/default.ovpn
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    restart: unless-stopped
+    networks:
+     - frontend
+    env_file:
+      - /home/baal/config/docker.env
+    volumes:
+      - /home/baal/jackett/config:/config
+      - /home/baal/jackett/downloads:/data
+    ports:
+      - "9117:9117"
 networks:
   frontend:
