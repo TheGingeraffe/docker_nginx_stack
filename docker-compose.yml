@@ -46,5 +46,23 @@ services:
       - /home/baal/plex/movies:/data/movies
       - /home/baal/plex/music:/data/music
       - /home/baal/plex/transcode:/data/transcode
+  transmission:
+    image: haugene/transmission-openvpn
+    container_name: transmission-openvpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    restart: unless-stopped
+    ports:
+      - "9091:9091"
+    env_file:
+      - /home/baal/config/docker.env
+    networks:
+      - frontend
+    volumes:
+      - /home/baal/transmission/downloads:/data
+      - /etc/localtime:/etc/localtime:ro
+      - /home/baal/transmission/openvpn/AirVPN_All-servers_UDP-443.ovpn:/etc/openvpn/custom/default.ovpn
 networks:
   frontend:
