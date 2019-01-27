@@ -40,6 +40,8 @@ services:
       - "32469:32469"
     networks:
       - frontend
+    env_file:
+      - /home/baal/config/docker.env
     volumes:
       - /home/baal/plex/config:/config
       - /home/baal/plex/tv:/data/tvshows
@@ -132,5 +134,19 @@ services:
       - /home/baal/shared:/shared
     ports:
       - "8181:8181"
+  filebot:
+    container_name: filebot
+    restart: always
+    image: jlesage/filebot
+    volumes:
+      - /home/baal/filebot:/config:rw
+      - /home/baal:/storage:rw
+    environment:
+      - USER_ID=1001
+      - GROUP_ID=1001
+    ports:
+      - "5800:5800"
+    networks:
+      - frontend
 networks:
   frontend:
