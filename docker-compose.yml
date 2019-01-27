@@ -106,5 +106,31 @@ services:
       - /home/baal/sonarr/config:/config
       - /home/baal/plex/tv:/tv
       - /home/baal/transmission/downloads:/data
+  ombi:
+    container_name: ombi
+    image: linuxserver/ombi
+    restart: always
+    networks:
+      - frontend
+    env_file:
+      - /home/baal/config/docker.env
+    volumes:
+      - /home/baal/ombi/config:/config
+    ports:
+      - "3579:3579"
+  tautulli:
+    container_name: tautulli
+    restart: always
+    image: linuxserver/tautulli
+    networks:
+      - frontend
+    env_file:
+      - /home/baal/config/docker.env
+    volumes:
+      - /home/baal/tautulli/config:/config
+      - /home/baal/tautulli/logs:/logs:ro
+      - /home/baal/shared:/shared
+    ports:
+      - "8181:8181"
 networks:
   frontend:
