@@ -60,6 +60,9 @@ services:
       - "9091:9091"
     env_file:
       - /home/baal/config/docker.env
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     networks:
       - frontend
     volumes:
