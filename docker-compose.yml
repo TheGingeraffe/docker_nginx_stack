@@ -11,7 +11,7 @@ services:
     network_mode: host
     volumes:
       - /home/baal/nginx/conf.d:/etc/nginx/conf.d
-      - /home/baal/nginx/ssl:/etc/letsencrypt
+      - /home/baal/nginx/ssl:/etc/ssl
       - /home/baal/nginx/www:/var/www
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
  
@@ -35,8 +35,8 @@ services:
       - /home/baal/config/docker.env
     volumes:
       - /home/baal/plex/config:/config
-      - /home/baal/plex/ssl:/ssl
       - /home/baal/plex/tv:/data/tvshows
       - /home/baal/plex/movies:/data/movies
       - /home/baal/plex/music:/data/music
       - /home/baal/plex/transcode:/data/transcode
+      - /home/baal/nginx/ssl:/data/ssl
