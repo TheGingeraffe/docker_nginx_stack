@@ -5,8 +5,7 @@ services:
     image: nginx:stable
     container_name: nginx
     restart: unless-stopped
-    networks:
-      - host
+    network_mode: host
     volumes:
       - /home/baal/nginx/conf.d:/etc/nginx/conf.d
       - /home/baal/nginx/ssl:/etc/ssl
@@ -17,8 +16,7 @@ services:
     image: linuxserver/plex
     container_name: plex
     restart: always
-    networks:
-      - host
+    network_mode: host
     env_file:
       - /home/baal/config/docker.env
     volumes:
