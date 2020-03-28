@@ -143,9 +143,9 @@ services:
     env_file:
       - ./config/docker.env
     environment: 
-      - WEB_ROOT=/slweb
+      - WEB_ROOT=/sync
       - CUSTOM_SERVER=https://thegingeraffe.com/slserver
-      - WEB_ACCESSURL=https://thegingeraffe.com/slweb
+      - WEB_ACCESSURL=https://thegingeraffe.com/sync
       - AUTOJOIN_ENABLED=true
       - AUTOJOIN_SERVERURL=https://thegingeraffe.com/slserver
       - AUTOJOIN_ROOM=Gingeraffe Lounge Party
