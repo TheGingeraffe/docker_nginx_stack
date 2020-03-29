@@ -105,6 +105,21 @@ services:
       - ./sonarr/config:/config
       - ./plex/tv:/tv
       - ./transmission/downloads:/data
+ 
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    restart: unless-stopped
+    ports:
+      - 6767:6767
+    networks:
+      - frontend
+    env_file:
+      - ./config/docker.env
+    volumes:
+      - ./bazarr/config:/config
+      - ./plex/tv:/tv
+      - ./plex/movies:/movies 
   
   ombi:
     container_name: ombi
