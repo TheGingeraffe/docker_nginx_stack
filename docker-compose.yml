@@ -1,42 +1,167 @@
 version: '3'
 services:
-  
   nginx:
     image: nginx:stable
     container_name: nginx
     restart: unless-stopped
-    ports:
-      - 8808:80
-      - 443:443
-    network_mode: host
     volumes:
-      - /home/baal/nginx/conf.d:/etc/nginx/conf.d
-      - /home/baal/nginx/ssl:/etc/ssl
-      - /home/baal/nginx/www:/var/www
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
- 
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/ssl:/etc/ssl
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - frontend
+
   plex:
-    image: linuxserver/plex
+    image: plexinc/pms-docker
     container_name: plex
-    restart: always
+    restart: unless-stopped
     ports:
       - 32400:32400
       - 1900:1900
       - 3005:3005
-      - 5353:5353
       - 8324:8324
       - 32410:32410
       - 32412:32412
       - 32413:32413
       - 32414:32414
       - 32469:32469
-    network_mode: host
-    env_file:
-      - /home/baal/config/docker.env
     volumes:
-      - /home/baal/plex/config:/config
-      - /home/baal/plex/tv:/data/tvshows
-      - /home/baal/plex/movies:/data/movies
-      - /home/baal/plex/music:/data/music
-      - /home/baal/plex/transcode:/data/transcode
-      - /home/baal/nginx/ssl:/data/ssl
+      - ./plex/config:/config
+      - ./plex/tv:/data/tvshows
+      - ./plex/movies:/data/movies
+      - ./plex/music:/data/music
+      - ./plex/transcode:/transcode
+      - ./plex/ssl:/ssl
+    networks:
+      - frontend
+  
+  transmission:
+    image: haugene/transmission-openvpn
+    container_name: transmission-openvpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    restart: unless-stopped
+    ports:
+      - 9091:9091
+    env_file:
+      - ./config/docker.env
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    networks:
+      - frontend
+    volumes:
+      - ./transmission/downloads:/data
+      - /etc/localtime:/etc/localtime:ro
+      - ./transmission/openvpn/AirVPN_All-servers_UDP-443.ovpn:/etc/openvpn/custom/default.ovpn
+  
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    restart: unless-stopped
+    networks:
+     - frontend
+    env_file:
+      - ./config/docker.env
+    volumes:
+      - ./jackett/config:/config
+      - ./jackett/downloads:/data
+    ports:
+      - 9117:9117
+  
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    restart: always
+    ports:
+      - 7878:7878
+    networks:
+      - frontend
+    env_file:
+      - ./config/docker.env
+    volumes:
+      - ./radarr/config:/config
+      - ./transmission/downloads:/data
+      - ./plex/movies:/movies
+      - ./transmission/downloads/trash:/data/trash
+  
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    restart: always
+    ports:
+      - 8989:8989
+    networks:
+      - frontend
+    env_file:
+      - ./config/docker.env
+    volumes:
+      - ./sonarr/config:/config
+      - ./plex/tv:/tv
+      - ./transmission/downloads:/data
+ 
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    restart: unless-stopped
+    ports:
+      - 6767:6767
+    networks:
+      - frontend
+    env_file:
+      - ./config/docker.env
+    volumes:
+      - ./bazarr/config:/config
+      - ./plex/tv:/tv
+      - ./plex/movies:/movies 
+ 
+  lidarr:
+    image: linuxserver/lidarr
+    container_name: lidarr
+    restart: unless-stopped
+    ports:
+      - 8686:8686
+    networks:
+      - frontend
+    env_file:
+      - ./config/docker.env
+    volumes:
+      - ./lidarr/config:/config
+      - ./lidarr/music:/music
+      - ./transmission/downloads:/downloads
+
+  ombi:
+    container_name: ombi
+    image: linuxserver/ombi
+    restart: always
+    networks:
+      - frontend
+    env_file:
+      - ./config/docker.env
+    volumes:
+      - ./ombi/config:/config
+    ports:
+      - 3579:3579
+  
+  tautulli:
+    container_name: tautulli
+    restart: always
+    image: linuxserver/tautulli
+    networks:
+      - frontend
+    env_file:
+      - ./config/docker.env
+    volumes:
+      - ./tautulli/config:/config
+      - ./tautulli/logs:/logs:ro
+      - ./shared:/shared
+    ports:
+      - 8181:8181
+
+networks:
+  frontend:
